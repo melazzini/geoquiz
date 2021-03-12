@@ -1,0 +1,19 @@
+Android studio gives us three tools to debug our apps: Logcat, Lint and the debugger.
+
+When you encounter runtime exceptions, remember to look at the last Logcat exception
+and at the first line of the stack trace. There will be a link to the file and line
+when the error happened.
+
+If the crashed occurs when the device is not plugged in, the info will be held for
+some time(~10 min or so) in the device, so you can plug the device in and then info will
+fill the Logcat window. Probably it will be only the last few lines of the problem.
+
+Using Logs with exceptions we can trace the execution of our(or not our) code in order.
+
+Most android debugging is just like kt debugging. However android has some specific
+debugging issues like for example debugging resources.
+
+Android Lint is a static analyser for android code. Lint knows pretty well the android
+framework and can inform you about misleading behavior or about xml objects in your app.
+
+Layout inspector and the profiler are other useful tools to examine our apps.

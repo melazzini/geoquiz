@@ -1,0 +1,3 @@
+Activities should be flexible. This means their views should be able to be composed at runtime
+depending on what the user or the device requires. Activities were not built to provide this
+flexibility.

@@ -1,0 +1,134 @@
+
+Two concepts:   ViewModel, UI state loss on process death
+
+One of the features of android is to auto select the right resources based on the runtime
+config changes.
+
+"ViewModel" will help us with saving the prev state
+"UI state loss on process death" is another problem, but less easily discoverable.
+
+ViewModel is in the lifecycle extensions
+
+===
+
+An activity can be destroyed in one of two scenarios: by the user terminating the app, or
+when a configuration change occurs. The Activity class has a property called isFinishing, which
+if it is true the activity is being destroyed because the user finished the activity, but if
+it is false it means that the activity is being destroyed by the system because of a config
+change. We don't need to track isFinishing manually, instead we can use ViewModel.
+
+A ViewModel survives config changes and is destroyed only when its associated activity is done.
+This means that a ViewModel stays in memory during a config change such as rotation.
+
+When a ViewModel is being destroyed the onCleared() method will be called.
+
+we have to associate the corresponding activity with an instance of the view model subclass.
+To do this we first call ViewModelProviders.of(this), which returns a ViewModelProvider.
+We then use the view model provider to associate the activity with the view model, calling
+<VIEW MODEL PROVIDER>.get(<VIEW MODEL>::class.java). Thus, the first time we call get(...)
+a new instance of the view model will be created, but if we again call the same function
+we will get a reference to the view model created initially.
+
+You cannot safely access a ViewModel until onCreate() was called, if you try to do so you'll
+get an IllegalStateException.
+
+by lazy in kotlin means the initialization will not happen until the first time we use the obj.
+
+===
+
+Each app gets its own linux process: one-ui-thread + memory
+
+Android might destroy an app's process in different situations. For example when the user
+left the app and the os needs memory. When an app's process is being destroyed, android
+won't call any callback functions. Resumed or paused activities has higher priority. When
+android needs to destroy processes, it will first look for lower priority processes.
+
+Android can temporarily save instance states("data to reconstruct activities") outside
+the activities, to do so we have to override Activity.onSaveInstanceState(bundle)
+
+The os calls onSaveInstanceState(bundle) any time the activity moves to the stopped state
+
+The default implementation of onSaveInstanceState(bundle) directs all of the activity's
+views to save their state as data in the bundle obj. You can override
+onSaveInstanceState(bundle) to save additional data to the bundle, which can then be read
+back in onCreate(Bundle?)
+
+In the superclass implementation of onCreate(Bundle?) the saved state of the views is
+retrieved and used to recreate the activity's view hierarchy.
+
+A bundle is a structure that maps string keys to values of certain limited types.
+
+Such Bundle objects are stored into activity records by the os. Your activity may not
+even exist, but the stashed data(Bundle) is stored in the activity record.
+
+Your activity can pass into the stashed state without onDestroy() been called.
+
+Typically you override onSaveInstanceStateBundle(Bundle) to stash small, transient-state
+data that belongs to the current activity in your bundle. override onStop() to save any
+permanent data, such as things the user is editing.
+
+The activity record gets snuffed only when the activity finishes(properly!) or on reboot.
+
+======
+
+AWCS we could use onSaveInstanceState(Bundle) for state loss with config changes instead
+of ViewModel.
+
+Since saved instance state is serialized to disk, you should avoid stashing any large
+or complex objects.
+
+ViewModel can be used for dynamic, rich or more complex data, for example it shines when
+used for download operations, etc.
+
+The limitation with ViewModel is that it does not survive after process death.
+
+lifecycle-ViewModel-savedstate is a new lib that was just released to allow ViewModels
+to save their state across process death.
+
+Savvy developers use both ViewModel and saved instance state in harmony.
+
+Use saved instance state to store the minimal information to be able to re-create
+the ui, for example a "current" index.
+
+Use ViewModel to cache rich data to populate the ui across config changes.
+
+When the activity is re-created after process death, use the saved instance state info
+to set up the ViewModel, as if the ViewModel and the activity were never destroyed.
+
+If a work causes the user to wait or unnecessarily uses resources like battery
+this redundant work is a problem.
+
+It is not possible yet to determine if an activity is being recreated after a process
+death of after a config change, therefore it is possible to do unnecessary work when
+combining saved instance state and ViewModel if we are not careful. One way to fix
+this problem is to make ViewModel smarter and compare the data that is being passed
+with the store data in the model, thus we can determine if we need to update
+the model with the saved instance state data or not.
+
+To store persistent data we have other alternatives: dbs, shared preferences and
+web servers. But remember that accessing a db is relatively slow compare to memory.
+
+=====
+
+Our project dependencies live in gradle.build
+
+gradle is the android build tool
+
+We can include any of the jetpack libs by adding the corresponding dependencies in
+gradle.build . Each of the jetpack libs is located in a package that starts with
+androidx. For this reason you will hear the term androidx and jetpack interchangeably.
+
+Jetpack is divided into four categories: foundation, architecture, behavior and ui.
+Each category is made of tools called components, for example the ViewModel is
+an architecture component. Fragment is a ui component, Room is another architecture
+component, etc.
+
+In the past the initial tools(components) were part of the so called android support libs.
+They were poorly organized comparing to what jetpack looks like and they lacked a lot
+of functionalities that we have today at our disposal with jetpack.
+
+
+
+
+
+

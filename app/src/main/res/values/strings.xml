@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">GeoQuiz</string>
+    <string name="btn_true">True</string>
+    <string name="btn_false">False</string>
+    <string name="btn_prev">Prev</string>
+    <string name="btn_next">Next</string>
+    <string name="msg_correct">Correct!</string>
+    <string name="msg_incorrect">Incorrect!</string>
+    <string name="question_sun">The Sun is at the center of the solar system</string>
+    <string name="question_alphaCentaur">Alpha Centaur is the closest start</string>
+    <string name="question_earth">The Earth is at the center of the solar system</string>
+    <string name="question_earth_moon">The Earth and the Moon rotate around their center of mass.</string>
+    <string name="question_derivative">If a function is continuous at some x,
+        then it has a derivative on the same point</string>
+</resources>

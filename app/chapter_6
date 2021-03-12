@@ -1,0 +1,118 @@
+Create, start and pass data are the most basic things to know how to do with activities.
+
+Creating an activity typically involves touching at least three files: a layout xml, a class
+and the AndroidManifest. If you touch those files in the wrong way android can get mad, a
+better way to create an activity is to use the New Activity wizard.
+
+The app manifest is an xml file containing metadata that describes your app to the os. The file
+is always named AndroidManifest.xml .
+
+Every activity in an app must be declared in the manifest so that the os can access it.
+
+The android:name attribute is required. You can specify the name with a dot or use the
+fully(with the package name as prefix) qualified name. The dot tells android that the pack
+name is the same that is specified in the package attribute at the top of the same file.
+
+The simplest way one activity can start another is with the startActivity(Intent) function.
+When an activity calls this method, this call is sent to the os, more specifically, it is
+sent to a part of the system called Activity Mng. The mng will create an activity and call
+onCreate(Bundle?). The Intent parameter tells the mng what activity to create.
+
+In android you have four types of components: Activities, services, broadcast receivers,
+and content providers.
+
+Intents are multipurpose communication tools, we will use an intent in this chapter to
+communicate with the os, and to tell it which activity to start, thus we need the next
+constructor: Intent(Context,Class<?>). The Context tells the ActivityManager which app pack
+the activity class can be found in. This kind of intents are called explicit intents.
+We use them to start activities within our app.
+
+Before starting the Activity, the mng checks the manifest for a declaration with the same
+name as the specified class. If it finds the declaration, it starts the activity, if it
+does not, you get an ActivityNotFoundException. This is why all of your activities must be
+declared in your manifest.
+
+Using the os to "communicate" via the mng makes it easy for an activity in one app to work
+with an activity in another app. In this case you use "implicit" intents. When an activity
+in your app wants to start an activity in another app, you create an implicit intent.
+
+To pass info from the calling activity to the callee activity you use extras, including them
+in the intents. The os forwards the intents to the recipient activities, which can then access
+the extras and retrieve the data.
+
+An extra is structure as a key-value pair: String - <OTHER TYPE>
+
+To add an extra to an intent, you use Intent.putExtra(...). It comes in many flavors, but it
+always has two arguments: a string(the name) and the value. It returns the intent itself, so
+you can chain multiple calls to putExtra(...).
+
+Using your pack name as a prefix qualifier for your extras prevents name collisions with
+extras from other apps.
+
+A companion object allows you to access functions without having an instance of a class,
+similar to static functions in java.
+
+To retrieve the value from an extra use Intent.get<Boolean/String, ....>Extra(<KEY>, <DEFT>)
+
+Activity.getIntent() always returns the Intent that started the activity. This is what you sent
+when calling startActivity(Intent)
+
+When you want to hear back from the child activity, you call
+Activity.startActivityForResult(Intent,Int), here the second parameter is the request code.
+
+The request code is a user defined integer that is sent to the child activity and then received
+back by the parent. It is used when an activity starts more than one type of child activity
+and needs to know who is reporting back.
+
+There are two functions you can call in the child activity to send data back to the parent:
+setResult(resultCode:Int) and setResult(resultCode:Int, data:Intent)
+
+Typically, the result code is on of two predefined constants: Activity.RESULT_OK/CANCELED.
+You can use RESULT_FIRST_USER as an offset when defining your own result codes.
+
+Calling setResult(...) is not required of the child activity. If you do not need to distinguish
+between results you can let the os send a default result code.
+
+A result code is always returned to the parent if the child activity was started with s
+tartActivityForResult(...)
+
+If setResult(...) is not called, then when the user presses the Back button, the parent will
+receive RESULT_CANCELED.
+
+When you need to pass info back to the calling activity you have to create an intent and use
+setResult(Int, Intent). To populate the intent with data you can use extras. In this case you
+can use the empty constructor of Intent.
+
+When the user goes from the child activity to the calling activity the mng will call
+onActivityResult(requestCode:Int, resultCode:Int, data:Intent?)
+Inside this function we can retrieve the information sent by the child activity
+
+            "When you click on an app in the launcher,
+                the os starts the launcher activity(4ex:MainActivity)"
+
+Launcher activity status is specified in the manifest by the intent-filter element:
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+
+When you create a new child activity in your app from a parent activity, both
+activities live in a stack, and the most recently created lies on op. When you press the back
+btn or call finish() you are popping the corresponding activity off the stack.
+Similarly with other apps, or even the launcher. The ActivityManager maintains a back stack,
+that is not just for your app's activities. Activities for all apps share the back stack,
+which is one reason the mng is involved in staring your activities and lives with the os.
+        "The mng does not start your application, it starts your activities".
+
+The stack represents the use of the os and device as a whole rather than the use of a single
+application.
+
+
+
+
+
+
+
+
+
+
+
+
